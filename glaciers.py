@@ -1,3 +1,7 @@
+import matplotlib
+import pytest
+from pathlib import Path
+
 class Glacier:
     def __init__(self, glacier_id, name, unit, lat, lon, code):
         raise NotImplementedError

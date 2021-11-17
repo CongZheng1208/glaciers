@@ -9,6 +9,5 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
     d = 2 * R * math.asin( math.sqrt( math.sin((lat2 - lat1)/2) ** 2 + math.cos(lat1) * math.cos(lat2)* (math.sin((lon2 - lon1)/2)**2)) )
 
-
     return d
     raise NotImplementedError

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*--v
 import matplotlib
-import pytest
 import csv
+
 from pathlib import Path
 
 
@@ -15,12 +15,22 @@ class Glacier:
         self.lon = lon
         self.code = code
         
-        self.mass_balance = []
-        
-        #raise NotImplementedError
+        self.mass_balance = {}
 
-    def add_mass_balance_measurement(self, year, mass_balance):
-        raise NotImplementedError
+    def add_mass_balance_measurement(self, year, mass_balance, sub_measure):
+        
+        if year not in self.mass_balance:
+
+            self.mass_balance[year] = mass_balance
+        
+        else:
+
+            if sub_measure == True:
+                self.mass_balance[year] += mass_balance
+            
+            else:
+                self.mass_balance[year] += 0 
+
 
     def plot_mass_balance(self, output_path):
         raise NotImplementedError
@@ -31,21 +41,47 @@ class GlacierCollection:
     def __init__(self, file_path):
 
         self.file_path = file_path
-        self.glacier_collection = []
+        self.glacier_collection = {}
 
-        with file_path.open() as f:
+        with open(self.file_path, newline = '') as f:
     
             file = csv.DictReader(f)
 
             for line in file:
-                #print(line[0])
-                print(line[1])
-                print(line[2])
-
+                id = line[ "WGMS_ID" ]
+                unit = line[ "POLITICAL_UNIT" ]
+                name = line[ "NAME" ]
+                lat  = float( line[ "LATITUDE" ] )
+                lon  = float( line[ "LONGITUDE" ] )
+                code = int( line[ "PRIM_CLASSIFIC" ] + line[ "FORM" ] + line[ "FRONTAL_CHARS" ] )
+                self.glacier_collection[ id ] = Glacier( id, name, unit, lat, lon, code )
+        
 
 
     def read_mass_balance_data(self, file_path):
-        raise NotImplementedError
+
+
+        with open( file_path, newline = '') as f:
+            file = csv.DictReader(f)
+
+            for line in file:
+
+                current_id = line[ "WGMS_ID" ] 
+                current_year = line[ "YEAR" ]
+                current_mass_balance = line[ "ANNUAL_BALANCE" ]
+                current_lower_bound = line[ "LOWER_BOUND" ]
+                
+                if int( current_lower_bound ) != 9999:
+                    sub_measure = True
+                else:
+                    sub_measure = False
+
+                if  current_mass_balance== "": 
+                    continue 
+                else: 
+                    self.glacier_collection[current_id].add_mass_balance_measurement(current_year, float(current_mass_balance), sub_measure)
+                
+       
 
     def find_nearest(self, lat, lon, n):
         """Get the n glaciers closest to the given coordinates."""
@@ -66,14 +102,7 @@ class GlacierCollection:
         raise NotImplementedError
 
 
-file_path = Path("/Users/congzheng/Desktop/sheet-A.csv")
-collection = GlacierCollection(file_path)
+file_path = Path("sheet-A.csv")
+test = GlacierCollection(file_path)
 
-
-#with open(file_path, newline = '') as f:
-    
-#    file = csv.reader(f)
-
-#   for line in file:
-#        print(line[3])
-
+test.read_mass_balance_data("sheet-EE.csv")

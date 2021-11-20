@@ -1,3 +1,4 @@
+import csv
 import math
 
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -64,6 +65,27 @@ def validation_for_year(year):
     elif year > 2021:
         raise ValueError(" year should be less than 2021 ")
     else: 
+        pass
+
+    return True
+
+
+def validation_for_mass_balance( mass_balance ):
+
+    if isinstance( mass_balance , int ):
+        pass
+    else:
+        raise TypeError( "mass balance should be a integer" )
+    
+    return True
+
+
+def validation_for_glaciers( id_collection, current_id ):
+# 该函数用于检查EE数据集中的当前id是否存在于A数据集
+    
+    if current_id not in id_collection:
+        raise ValueError(" The identifier of the glacier could not be recognized! It does not exist in the current glacier collection. ")
+    else:
         pass
 
     return True

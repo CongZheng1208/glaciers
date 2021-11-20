@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*--v
 import matplotlib
 import csv
+import utils
 
 from pathlib import Path
 
@@ -21,19 +22,38 @@ class Glacier:
         
         if year not in self.mass_balance:
 
-            self.mass_balance[year] = mass_balance
+            self.mass_balance[ year ] = mass_balance
         
         else:
 
             if sub_measure == True:
-                self.mass_balance[year] += mass_balance
+                self.mass_balance[ year ] += mass_balance
             
             else:
-                self.mass_balance[year] += 0 
+                self.mass_balance[ year ] += 0 
 
 
     def plot_mass_balance(self, output_path):
         raise NotImplementedError
+
+
+    def get_id(self):
+        return self.glacier_id
+
+    def get_code(self):
+        return self.code
+
+    def get_latitude(self):
+        return self.lat
+
+    def get_lontitude(self):
+        return self.lon
+
+    def get_name(self):
+        return self.name
+
+    def get_mass(self):
+        return self.mass_balance
 
         
 class GlacierCollection:
@@ -54,6 +74,8 @@ class GlacierCollection:
                 lat  = float( line[ "LATITUDE" ] )
                 lon  = float( line[ "LONGITUDE" ] )
                 code = int( line[ "PRIM_CLASSIFIC" ] + line[ "FORM" ] + line[ "FRONTAL_CHARS" ] )
+
+
                 self.glacier_collection[ id ] = Glacier( id, name, unit, lat, lon, code )
         
 
@@ -63,6 +85,7 @@ class GlacierCollection:
 
         with open( file_path, newline = '') as f:
             file = csv.DictReader(f)
+            id_collection = self.glacier_collection.keys()
 
             for line in file:
 
@@ -71,16 +94,18 @@ class GlacierCollection:
                 current_mass_balance = line[ "ANNUAL_BALANCE" ]
                 current_lower_bound = line[ "LOWER_BOUND" ]
                 
-                if int( current_lower_bound ) != 9999:
-                    sub_measure = True
-                else:
-                    sub_measure = False
+                if utils.validation_for_glaciers(id_collection, current_id):
+                    if int( current_lower_bound ) != 9999:
+                        sub_measure = True
+                    else:
+                        sub_measure = False
 
-                if  current_mass_balance== "": 
-                    continue 
-                else: 
-                    self.glacier_collection[current_id].add_mass_balance_measurement(current_year, float(current_mass_balance), sub_measure)
-                
+                    if  current_mass_balance== "": 
+                        continue 
+                    else: 
+                        self.glacier_collection[current_id].add_mass_balance_measurement(current_year, float(current_mass_balance), sub_measure)
+                else:
+                    pass
        
 
     def find_nearest(self, lat, lon, n):

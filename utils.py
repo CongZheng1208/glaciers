@@ -1,16 +1,36 @@
-import csv
+# -*- coding: utf-8 -*--v
+from pathlib import Path
 import math
+import pathlib
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Return the distance in km between two points around the Earth.
 
     Latitude and longitude for each point are given in degrees.
     """
+
+    validation_for_lat(lat1)
+    validation_for_lat(lat2)
+    validation_for_lon(lon1)
+    validation_for_lon(lon2)
+
     R = 6371
 
     distance = 2 * R * math.asin( math.sqrt( math.sin((lat2 - lat1)/2) ** 2 + math.cos(lat1) * math.cos(lat2)* (math.sin((lon2 - lon1)/2)**2)) )
 
     return distance
+
+
+def validation_for_csv( file_path ):
+
+    file_path = str(file_path)
+
+    if file_path.split(".")[-1] != 'csv':
+        raise IOError( "please input a csv file" )
+    else:
+        pass
+    
+    return True
 
 
 def validation_for_id(id):

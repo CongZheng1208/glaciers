@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*--v
 
 import csv
+import re
 import sys
 import utils
 
@@ -159,15 +160,48 @@ class GlacierCollection:
             distance_collection[ current_glacier.name ] = distance
         
         # sort dict into order of value from least to greatest
-        distance_dict = dict(sorted(distance_collection.items(), key=lambda item: item[1]))
+        distance_collection = dict( sorted( distance_collection.items(), key=lambda item: item[1] ) )
 
-        names = list( distance_dict.keys() )[ :n ]
+        names = list( distance_collection.keys() )[ :n ]
 
         return names
     
     def filter_by_code(self, code_pattern):
         """Return the names of glaciers whose codes match the given pattern."""
+
+        full_code = utils.validation_for_code_pattern( code_pattern )
+        names = []
+    
+        if full_code:
+
+            for key in self.glacier_collection:
+                if self.glacier_collection[ key ].code == code_pattern:          
+                    names.append( self.glacier_collection[ key ].name )
         
+        else: 
+
+            pos = []
+            search = re.compile( r"\d" )
+            for d in search.finditer( code_pattern ):
+                pos.append( d.start() )
+        
+            if len(pos) == 1:
+                indx = pos[ 0 ]
+                for key in self.glacier_collection.keys():
+                    if str(self.glacier_collection[ key ].code )[ indx ] == code_pattern[indx]:
+                        names.append( self.glacier_collection[ key ].name )
+                        print( self.glacier_collecton[ key ].code )
+        
+            elif len(pos) == 2:
+                indx_0, indx_1 = pos[ 0 ], pos[ 1 ] 
+                for key in self.glacier_collection:
+                    g_code = str( self.glacier_collection[ key ].code )
+                    if g_code[ indx_0 ] == code_pattern[ indx_0 ] and g_code[ indx_1 ] == code_pattern[ indx_1 ]:
+                        names.append( self.glacier_collection[ key ].name )
+        
+        print("Number of matching glaciers:", len( names ))
+
+        return names
 
     def sort_by_latest_mass_balance( self, n = 5, reverse = False ):
         """Return the N glaciers with the highest area accumulated in the last measurement."""
@@ -317,3 +351,8 @@ list1 = test.sort_by_latest_mass_balance( n=5, reverse = True )
 
 for i in range(5):
     print( list1[i].glacier_id )
+
+names = test.filter_by_code('4?3')
+
+for i in range(len(names)):
+    print( names[i])

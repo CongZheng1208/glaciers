@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*--v
 from pathlib import Path
 import math
+import re
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Return the distance in km between two points around the Earth.
@@ -34,7 +35,7 @@ def validation_for_csv( file_path ):
 
 def validation_for_id(id):
 
-    if isinstance( int(id) , int ):
+    if id.isdigit( ):
         if len( str( id )) == 5:
             pass
         else:
@@ -102,27 +103,55 @@ def validation_for_mass_balance( mass_balance ):
 def validation_for_code_pattern( code_pattern ):
 
     if isinstance( code_pattern , str ):
+
         if len( code_pattern ) == 3:
-            pass
+
+            if all( (char.isdigit() or char =='?') for char in code_pattern):
+
+                if all((char == "?") for char in code_pattern):
+
+                    raise ValueError("Need atleast one digit in code pattern")
+                 
+                elif all(char.isdigit() for char in code_pattern):
+
+                    full_code = True 
+
+                else: 
+
+                    full_code = False
+
+            else: 
+                raise ValueError("Code pattern must contain only digits and ?")
+        
         else:
             raise ValueError( "length of code pattern should be 3" )
+
+
     elif isinstance(code_pattern, int):
-        if len( str( code_pattern ) == 3):
-            pass
+
+        if len( str( code_pattern )) == 3:
+
+            full_code = True
+        
         else:
+        
             raise TypeError( "length of code pattern should be 3" )
+    
     else:
+        
         raise TypeError( "code pattern should be a integer or a string" )
     
-    return True
+    return full_code
 
 
 def validation_for_glaciers( id_collection, current_id ):
 # 该函数用于检查EE数据集中的当前id是否存在于A数据集
     
     if current_id not in id_collection:
+
         raise ValueError(" The identifier of the glacier could not be recognized! It does not exist in the current glacier collection. ")
     else:
+
         pass
 
     return True

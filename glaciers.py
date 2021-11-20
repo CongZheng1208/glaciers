@@ -9,82 +9,108 @@ from pathlib import Path
 from matplotlib import pyplot
 
 class Glacier:
-    def __init__(self, glacier_id, name, unit, lat, lon, code):
 
-        self.glacier_id = glacier_id
-        self.name = name
-        self.unit = unit
-        self.lat = lat
-        self.lon = lon
-        self.code = code
-        
-        self.mass_balance = {}
+    def __init__(self, glacier_id, name, unit, lat, lon, code):
+        """This function is used to initialize the glacier object"""
+
+        self.__glacier_id = glacier_id
+        self.__name = name
+        self.__unit = unit
+        self.__lat = lat
+        self.__lon = lon
+        self.__code = code
+        self.__mass_balance = {}
 
     def add_mass_balance_measurement(self, year, mass_balance, sub_measure):
+        """This function is used to add its mass balance value to the glacier objec"""
         
-        if year not in self.mass_balance:
+        if year not in self.__mass_balance:
 
-            self.mass_balance[ year ] = mass_balance
+            self.__mass_balance[ year ] = mass_balance
         
         else:
 
             if sub_measure == True:
-                self.mass_balance[ year ] += mass_balance
+
+                self.__mass_balance[ year ] += mass_balance
             
             else:
-                self.mass_balance[ year ] += 0 
+
+                self.__mass_balance[ year ] += 0 
 
 
     def plot_mass_balance(self, output_path):
+        """This function is used to draw the change trend of the mass balance value of the glacier object"""
 
         x_values = []
         y_values = []
 
-        # make sure that the glacier has mass balance measurements
-        if self.mass_balance: 
+        if self.__mass_balance: 
 
-            for year in self.mass_balance.keys():
+            for year in self.__mass_balance.keys():
 
                 x_values.append( year )
-                y_values.append( self.mass_balance[year] )
+                y_values.append( self.__mass_balance[ year ] )
         
-            pyplot.pyplot.figure()
-            pyplot.plot(x_values, y_values)
-
+            pyplot.figure()
+            pyplot.plot( x_values, y_values )
             pyplot.xlabel( "Year" )
-            pyplot.ylabel( "Mass Balance [mm.w.e]" )
-    
-            pyplot.title( str( self.name ) + "Mass Balance Measurements Vs Years")
-            pyplot.savefig( output_path + str( self.name ) + "_mass_balance_plot.png")
+            pyplot.ylabel( "Mass Balance Measurement [mm.w.e]" )
+            pyplot.title( str( self.__name ) + "'s diagram of changes in mass balance")
+            pyplot.savefig( output_path + str( self.__name ) + "'s diagram of changes in mass balance.png")
         
         else:
 
             print("This glacier has no record of mass balance.")
 
 
-    def get_id(self):
-        return self.glacier_id
+    def get_glacier_id(self):
+        """This function is used to obtain the identifier of the glacier object"""
 
-    def get_code(self):
-        return self.code
+        return self.__glacier_id
 
-    def get_latitude(self):
-        return self.lat
-
-    def get_lontitude(self):
-        return self.lon
 
     def get_name(self):
-        return self.name
+        """This function is used to get the name of the glacier object"""
 
-    def get_mass(self):
-        return self.mass_balance
+        return self.__name
+
+
+    def get_unit(self):
+        """This function is used to obtain the unit of the glacier object"""
+
+        return self.__unit
+
+
+    def get_latitude(self):
+        """This function is used to get the latitude of the glacier object"""
+
+        return self.__lat
+
+
+    def get_lontitude(self):
+        """This function is used to obtain the longitude of the glacier object"""
+
+        return self.__lon
+    
+
+    def get_code(self):
+        """This function is used to obtain the code of the glacier object"""
+
+        return self.__code
+
+
+    def get_mass_balance(self):
+        """This function is used to obtain the mass balance measurement of the glacier object"""
+
+        return self.__mass_balance
 
         
 class GlacierCollection:
 
     def __init__(self, file_path):
-
+        """This function is used to initialize the glacier object collection"""
+        
         self.file_path = file_path
 
         utils.validation_for_csv(file_path)
@@ -114,33 +140,40 @@ class GlacierCollection:
 
 
     def read_mass_balance_data(self, file_path):
+        """This function is used to read the mass balance measurement of the glacier object collection and add it to the corresponding glacier object"""
 
         utils.validation_for_csv( file_path )
 
-        with open( file_path, newline = '') as f:
+        with open( file_path, newline = '') as file:
 
-            file = csv.DictReader(f)            
+            dict_file = csv.DictReader(file)            
 
             id_collection = self.glacier_collection.keys()
 
-            for line in file:
+            for line in dict_file:
 
                 current_id = line[ "WGMS_ID" ] 
                 current_year = line[ "YEAR" ]
                 current_mass_balance = line[ "ANNUAL_BALANCE" ]
                 current_lower_bound = line[ "LOWER_BOUND" ]
                 
-                utils.validation_for_glaciers(id_collection, current_id)
+                utils.validation_for_glaciers( id_collection, current_id )
                 
                 if int( current_lower_bound ) != 9999:
+
                     sub_measure = True
+
                 else:
+
                     sub_measure = False
 
                 if  current_mass_balance== "": 
+
                     continue 
+
                 else: 
-                    self.glacier_collection[current_id].add_mass_balance_measurement(current_year, float(current_mass_balance), sub_measure)
+
+                    self.glacier_collection[ current_id ].add_mass_balance_measurement( current_year, float( current_mass_balance ), sub_measure )
        
 
     def find_nearest( self, lat, lon, n = 5 ):
@@ -153,13 +186,12 @@ class GlacierCollection:
 
         for current_glacier in self.glacier_collection.values():
 
-            lat2, lon2 = current_glacier.lat, current_glacier.lon
+            lat2, lon2 = current_glacier.get_latitude(), current_glacier.get_lontitude()
 
             distance = utils.haversine_distance( lat, lon, lat2, lon2 )
 
-            distance_collection[ current_glacier.name ] = distance
+            distance_collection[ current_glacier.get_name() ] = distance
         
-        # sort dict into order of value from least to greatest
         distance_collection = dict( sorted( distance_collection.items(), key=lambda item: item[1] ) )
 
         names = list( distance_collection.keys() )[ :n ]
@@ -170,118 +202,124 @@ class GlacierCollection:
         """Return the names of glaciers whose codes match the given pattern."""
 
         full_code = utils.validation_for_code_pattern( code_pattern )
-        names = []
+        glacier_names = []
     
         if full_code:
 
             for key in self.glacier_collection:
                 if self.glacier_collection[ key ].code == code_pattern:          
-                    names.append( self.glacier_collection[ key ].name )
+                    glacier_names.append( self.glacier_collection[ key ].name )
         
         else: 
 
-            pos = []
-            search = re.compile( r"\d" )
-            for d in search.finditer( code_pattern ):
-                pos.append( d.start() )
+            match_data = []
+            match_regular_expression = re.compile( r"\d" )
+            for match_item in match_regular_expression.finditer( code_pattern ):
+                match_data.append( match_item.start() )
         
-            if len(pos) == 1:
-                indx = pos[ 0 ]
+            if len(match_data) == 1:
+                index_0 = match_data[ 0 ]
                 for key in self.glacier_collection.keys():
-                    if str(self.glacier_collection[ key ].code )[ indx ] == code_pattern[indx]:
-                        names.append( self.glacier_collection[ key ].name )
+                    if str(self.glacier_collection[ key ].code )[ index_0 ] == code_pattern[ index_0 ]:
+                        glacier_names.append( self.glacier_collection[ key ].name )
                         print( self.glacier_collecton[ key ].code )
         
-            elif len(pos) == 2:
-                indx_0, indx_1 = pos[ 0 ], pos[ 1 ] 
+            elif len(match_data) == 2:
+                index_0, index_1 = match_data[ 0 ], match_data[ 1 ] 
                 for key in self.glacier_collection:
-                    g_code = str( self.glacier_collection[ key ].code )
-                    if g_code[ indx_0 ] == code_pattern[ indx_0 ] and g_code[ indx_1 ] == code_pattern[ indx_1 ]:
-                        names.append( self.glacier_collection[ key ].name )
-        
-        print("Number of matching glaciers:", len( names ))
 
-        return names
+                    g_code = str( self.glacier_collection[ key ].get_code() )
+                    if g_code[ index_0 ] == code_pattern[ index_0 ] and g_code[ index_1 ] == code_pattern[ index_1 ]:
+                        glacier_names.append( self.glacier_collection[ key ].get_name() )
+     
+        return glacier_names
+
 
     def sort_by_latest_mass_balance( self, n = 5, reverse = False ):
         """Return the N glaciers with the highest area accumulated in the last measurement."""
+
         mass_balance_collection = {}
         latest_mass_balance_collection = []
-        
-        # 对于
+    
         for current_glacier in self.glacier_collection.values():
             
-            #sort the years from oldest to most recent
-            current_year_order = sorted( current_glacier.mass_balance.keys(), key=lambda key: key )
+            current_year_order = sorted( current_glacier.get_mass_balance().keys(), key=lambda key: key )
             
-            if len(current_year_order) != 0: # making sure the glacier has some measurements
+            if len(current_year_order) != 0: 
 
                 latest_year = current_year_order[ -1 ]
-                mass_balance_collection[ current_glacier.glacier_id ] = current_glacier.mass_balance[ latest_year ]
+                mass_balance_collection[ current_glacier.get_glacier_id() ] = current_glacier.get_mass_balance()[ latest_year ]
             
             else:
 
                 continue
 
-        # order the dictionary in order of smallest to largest change 
         mass_balance_collection = dict( sorted( mass_balance_collection.items(), key=lambda item: item[1] ))
         keys = list( mass_balance_collection.keys() )
 
         if reverse == False:
 
-            keys = keys[-n:]
+            keys = keys[ -n: ]
             for key in keys: 
                 latest_mass_balance_collection.append( self.glacier_collection[ key ] ) 
 
         else: 
 
-            keys = keys[:n]
+            keys = keys[ :n ]
             for key in keys:
                 latest_mass_balance_collection.append( self.glacier_collection[ key ] )
 
         return latest_mass_balance_collection
 
     def summary(self):
-        # print the number of glaciers in collection
-        print("This collection has", len(self.glacier_collection), "glaciers")
+        """
+        This function is used to print the total number of glaciers in the glacier object collection, 
+        the earliest measurement year, and the proportion of glaciers whose mass balance decreases.
+        """
 
-        # tracking variables 
+        print( "This collection has", len( self.glacier_collection ), "glaciers" )
+
         earliest_year = sys.maxsize
-        glacier_w_measure = 0 
-        shrink = 0 
-        grow = 0 
 
-        for glacier in self.glacier_collection:
+        glacier_measure_count = 0 
+        shrink_count = 0 
+        grow_count = 0 
 
-            glac = self.glacier_collection[glacier]
+        for current_glacier in self.glacier_collection.values():
 
             # find the earliest measurement
-            year_order = sorted(glac.mass_balance.keys(), key=lambda key: key)
+            year_order = sorted(current_glacier.get_mass_balance().keys(), key=lambda key: key)
 
             if len(year_order) != 0:
+
                 year  = int(year_order[0]) 
+
                 if int(year) <= earliest_year:
                     earliest_year = year
 
-                # find out if the last measurement saw the glacier shrink
                 latest_year = year_order[-1]
-                mass_measurement = glac.mass_balance[latest_year]
+                mass_measurement = current_glacier.get_mass_balance()[latest_year]
+
                 if mass_measurement < 0: 
-                    shrink += 1
+                    shrink_count += 1
                 else: 
-                    grow += 1
+                    grow_count += 1
                 
-                glacier_w_measure += 1
+                glacier_measure_count += 1
             else: 
                 continue
         
-        shrink_perc = int( round( 100 * shrink / glacier_w_measure ))
+        shrink_percent = int( round( 100 * shrink_count / glacier_measure_count ))
         print( "The earliest measurement was in", earliest_year )
-        print( str( shrink_perc ) + "% of glaciers shrunk in their last measurement" )
+        print( str( shrink_percent ) + "% of glaciers shrunk in their last measurement" )
 
 
     def plot_extremes(self, output_path):
-        # tracking variables
+        """
+        This function is used to draw the historical mass balance measurement of the glacier object with 
+        the largest and smallest changes in the recent period.
+        """
+     
         most_shrink = sys.maxsize
         shrink_id = None
         most_grow = -sys.maxsize
@@ -289,70 +327,46 @@ class GlacierCollection:
 
         for current_glacier in self.glacier_collection.values():
             
-            year_order = sorted(current_glacier.mass_balance.keys(), key=lambda key: key)
+            year_order = sorted(current_glacier.get_mass_balance().keys(), key=lambda key: key)
             
-            if len(year_order) != 0: # making sure the glacier has some measurements
+            if len(year_order) != 0: 
                 latest_year = year_order[-1]
-                mass_measure = current_glacier.mass_balance[latest_year]
+                mass_measure = current_glacier.get_mass_balance()[latest_year]
                 
                 if mass_measure < 0 and mass_measure < most_shrink:
                     most_shrink = mass_measure
-                    shrink_id = current_glacier.glacier_id
+                    shrink_id = current_glacier.get_glacier_id()
                 
                 elif mass_measure > 0 and mass_measure > most_grow:
                     most_grow = mass_measure
-                    grow_id = current_glacier.glacier_id
-
-        print(shrink_id)
-        print(grow_id)
-        print(" ")
-
-            
+                    grow_id = current_glacier.get_glacier_id()
+         
         x_values_0 = []
         y_values_0 = []
-        # make sure that the glacier has mass balance measurements
-        for year in self.glacier_collection[shrink_id].mass_balance:
-            x_values_0.append(int(year))
-            y_values_0.append(self.glacier_collection[shrink_id].mass_balance[year])
 
-        # plotting
+        for year in self.glacier_collection[shrink_id].get_mass_balance():
+            x_values_0.append(int(year))
+            y_values_0.append(self.glacier_collection[shrink_id].get_mass_balance()[year])
+
         pyplot.figure()
         pyplot.plot(x_values_0, y_values_0)
         pyplot.xlabel("Year")
-        pyplot.ylabel("Mass Balance [mm.w.e]")
-        pyplot.title("Glacier Collection Shrink Plot")
+        pyplot.ylabel("Mass Balance Measurement [mm.w.e]")
+        pyplot.title("Diagram of the glaciers with the most growth in mass balance")
 
-        pyplot.savefig(output_path+"extremes_plot0.png")
+        pyplot.savefig( output_path + "Diagram of the glaciers with the most growth in mass balance.png" )
 
         x_values_1 = []
         y_values_1 = []
-        # make sure that the glacier has mass balance measurements
-        for year in self.glacier_collection[grow_id].mass_balance:
+
+        for year in self.glacier_collection[grow_id].get_mass_balance():
             x_values_1.append(int(year))
-            y_values_1.append(self.glacier_collection[grow_id].mass_balance[year])
+            y_values_1.append(self.glacier_collection[grow_id].get_mass_balance()[year])
 
-        # plotting
         pyplot.figure()
-        pyplot.plot(x_values_1, y_values_1)
+        pyplot.plot( x_values_1, y_values_1 )
         pyplot.xlabel("Year")
-        pyplot.ylabel("Mass Balance [mm.w.e]")
-        pyplot.title("Glacier Collection Grow Plot")
+        pyplot.ylabel("Mass Balance Measurement [mm.w.e]")
+        pyplot.title("Diagram of the glaciers with the most shrinking mass balance")
 
-        pyplot.savefig(output_path+"extremes_plot1.png")
-
-
-file_path = Path("sheet-A.csv")
-test = GlacierCollection(file_path)
-test.read_mass_balance_data("sheet-EE.csv")
-test.summary()
-#print(test.glacier_collection.keys())
-test.plot_extremes("/Users/congzheng/Desktop/")
-list1 = test.sort_by_latest_mass_balance( n=5, reverse = True )
-
-for i in range(5):
-    print( list1[i].glacier_id )
-
-names = test.filter_by_code('4?3')
-
-for i in range(len(names)):
-    print( names[i])
+        pyplot.savefig( output_path + "Diagram of the glaciers with the most shrinking mass balance.png" )

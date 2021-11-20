@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*--v
 from pathlib import Path
 import math
-import pathlib
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Return the distance in km between two points around the Earth.
@@ -16,8 +15,8 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
     R = 6371
 
-    distance = 2 * R * math.asin( math.sqrt( math.sin((lat2 - lat1)/2) ** 2 + math.cos(lat1) * math.cos(lat2)* (math.sin((lon2 - lon1)/2)**2)) )
-
+    distance =  2*R*math.asin(math.sqrt(math.sin((lat2 - lat1)/2)**2 + ((math.cos(lat1) * math.cos(lat2)) * (math.sin((lon2-lon1)/2)**2)))
+)
     return distance
 
 
@@ -35,7 +34,7 @@ def validation_for_csv( file_path ):
 
 def validation_for_id(id):
 
-    if isinstance( id , int ):
+    if isinstance( int(id) , int ):
         if len( str( id )) == 5:
             pass
         else:
@@ -96,6 +95,24 @@ def validation_for_mass_balance( mass_balance ):
         pass
     else:
         raise TypeError( "mass balance should be a integer" )
+    
+    return True
+
+
+def validation_for_code_pattern( code_pattern ):
+
+    if isinstance( code_pattern , str ):
+        if len( code_pattern ) == 3:
+            pass
+        else:
+            raise ValueError( "length of code pattern should be 3" )
+    elif isinstance(code_pattern, int):
+        if len( str( code_pattern ) == 3):
+            pass
+        else:
+            raise TypeError( "length of code pattern should be 3" )
+    else:
+        raise TypeError( "code pattern should be a integer or a string" )
     
     return True
 

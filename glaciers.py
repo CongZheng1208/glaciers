@@ -23,6 +23,9 @@ class Glacier:
 
     def add_mass_balance_measurement(self, year, mass_balance, sub_measure):
         """This function is used to add its mass balance value to the glacier objec"""
+
+        utils.validation_for_year( year )
+        utils.validation_for_mass_balance( mass_balance )
         
         if year not in self.__mass_balance:
 
@@ -110,18 +113,17 @@ class GlacierCollection:
 
     def __init__(self, file_path):
         """This function is used to initialize the glacier object collection"""
-        
+
+        utils.validation_for_csv( file_path )
+
         self.file_path = file_path
-
-        utils.validation_for_csv(file_path)
-
         self.glacier_collection = {}
 
-        with open(self.file_path, newline = '') as f:
+        with open(self.file_path, newline = '') as file:
     
-            file = csv.DictReader(f)
+            dict_file = csv.DictReader(file)
 
-            for line in file:
+            for line in dict_file:
 
                 id = line[ "WGMS_ID" ]
                 unit = line[ "POLITICAL_UNIT" ]
@@ -181,19 +183,17 @@ class GlacierCollection:
 
         utils.validation_for_lat( lat )
         utils.validation_for_lon( lon )
+        utils.validation_for_n( n )
 
         distance_collection = {} 
 
         for current_glacier in self.glacier_collection.values():
 
             lat2, lon2 = current_glacier.get_latitude(), current_glacier.get_lontitude()
-
             distance = utils.haversine_distance( lat, lon, lat2, lon2 )
-
             distance_collection[ current_glacier.get_name() ] = distance
         
         distance_collection = dict( sorted( distance_collection.items(), key=lambda item: item[1] ) )
-
         names = list( distance_collection.keys() )[ :n ]
 
         return names
@@ -207,8 +207,8 @@ class GlacierCollection:
         if full_code:
 
             for key in self.glacier_collection:
-                if self.glacier_collection[ key ].code == code_pattern:          
-                    glacier_names.append( self.glacier_collection[ key ].name )
+                if self.glacier_collection[ key ].get_code() == code_pattern:          
+                    glacier_names.append( self.glacier_collection[ key ].get_name() )
         
         else: 
 
@@ -219,24 +219,26 @@ class GlacierCollection:
         
             if len(match_data) == 1:
                 index_0 = match_data[ 0 ]
-                for key in self.glacier_collection.keys():
-                    if str(self.glacier_collection[ key ].code )[ index_0 ] == code_pattern[ index_0 ]:
-                        glacier_names.append( self.glacier_collection[ key ].name )
-                        print( self.glacier_collecton[ key ].code )
+                for match_key in self.glacier_collection.keys():
+
+                    if str(self.glacier_collection[ match_key ].get_code() )[ index_0 ] == code_pattern[ index_0 ]:
+                        glacier_names.append( self.glacier_collection[ match_key ].get_name() )
         
             elif len(match_data) == 2:
                 index_0, index_1 = match_data[ 0 ], match_data[ 1 ] 
-                for key in self.glacier_collection:
+                for match_key in self.glacier_collection:
 
-                    g_code = str( self.glacier_collection[ key ].get_code() )
-                    if g_code[ index_0 ] == code_pattern[ index_0 ] and g_code[ index_1 ] == code_pattern[ index_1 ]:
-                        glacier_names.append( self.glacier_collection[ key ].get_name() )
+                    glacier_match_code = str( self.glacier_collection[ match_key ].get_code() )
+                    if glacier_match_code[ index_0 ] == code_pattern[ index_0 ] and glacier_match_code[ index_1 ] == code_pattern[ index_1 ]:
+                        glacier_names.append( self.glacier_collection[ match_key ].get_name() )
      
         return glacier_names
 
 
     def sort_by_latest_mass_balance( self, n = 5, reverse = False ):
         """Return the N glaciers with the highest area accumulated in the last measurement."""
+
+        utils.validation_for_n(n)
 
         mass_balance_collection = {}
         latest_mass_balance_collection = []
@@ -287,7 +289,6 @@ class GlacierCollection:
 
         for current_glacier in self.glacier_collection.values():
 
-            # find the earliest measurement
             year_order = sorted(current_glacier.get_mass_balance().keys(), key=lambda key: key)
 
             if len(year_order) != 0:
@@ -370,3 +371,11 @@ class GlacierCollection:
         pyplot.title("Diagram of the glaciers with the most shrinking mass balance")
 
         pyplot.savefig( output_path + "Diagram of the glaciers with the most shrinking mass balance.png" )
+
+
+file_path = Path("sheet-A.csv")
+test = GlacierCollection(file_path)
+test.read_mass_balance_data("sheet-EE.csv")
+test.summary()
+#print(test.filter_by_code('??6'))
+print(test.sort_by_latest_mass_balance(  ))

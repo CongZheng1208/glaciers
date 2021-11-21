@@ -41,7 +41,7 @@ def validation_for_id(id):
 
     if id.isdigit( ):
 
-        if len( str( id )) == 5:
+        if len( id ) == 5:
             pass
         else:
             raise ValueError( "length of id should be 5" )
@@ -56,13 +56,17 @@ def validation_for_id(id):
 def validation_for_lat( lat ): 
     """This function is used to verify the correctness of the latitude"""
 
-    if lat > 90 or lat < -90 :
+    if isinstance( lat , float ) or isinstance( lat, int ):
+        if lat > 90 or lat < -90 :
 
-        raise ValueError(" latitude should be in range of (-90,90) ")
+            raise ValueError(" latitude should be in range of (-90,90) ")
 
+        else:
+
+            pass
     else:
 
-        pass
+        raise TypeError(" latitude should be a number ")
 
     return True
 
@@ -70,13 +74,18 @@ def validation_for_lat( lat ):
 def validation_for_lon( lon ): 
     """This function is used to verify the correctness of longitude"""
 
-    if lon > 180 or lon < -180:
+    if isinstance( lon , float ) or isinstance( lon, int ):
 
-        raise ValueError(" lontitude should be in range of (-180,180) ")
+        if lon > 180 or lon < -180:
 
+            raise ValueError(" lontitude should be in range of (-180,180) ")
+
+        else:
+
+            pass
     else:
 
-        pass
+        raise TypeError(" lontitude should be a number ")
 
     return True
 
@@ -103,11 +112,11 @@ def validation_for_unit( unit ):
 def validation_for_year(year):
     """This function is used to verify the correctness of the year"""
 
-    if not isinstance( year, int ):
+    if not year.isdigit():
 
         raise ValueError(" year should be a integer ")
 
-    elif year > 2021:
+    elif int(year) > 2021:
 
         raise ValueError(" year should be less than 2021 ")
 
@@ -121,7 +130,7 @@ def validation_for_year(year):
 def validation_for_mass_balance( mass_balance ):
     """This function is used to verify the correctness of the mass balance measurement"""
 
-    if isinstance( mass_balance , int ):
+    if isinstance( mass_balance, int) or isinstance( mass_balance, float) :
 
         pass
 
@@ -175,6 +184,24 @@ def validation_for_code_pattern( code_pattern ):
         raise TypeError( "code pattern should be a integer or a string" )
     
     return full_code
+
+def validation_for_n( n ): 
+    """This function is used to verify the correctness of longitude"""
+
+    if isinstance( n , int ):
+
+        if n <= 0:
+
+            raise ValueError(" n should be an integer more than 0 ")
+
+        else:
+
+            pass
+    else:
+
+        raise TypeError(" n should be a integer ")
+
+    return True
 
 
 def validation_for_glaciers( id_collection, current_id ):

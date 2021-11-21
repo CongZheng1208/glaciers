@@ -15,8 +15,7 @@ def haversine_distance( lat1, lon1, lat2, lon2 ):
 
     R = 6371
 
-    distance =  2 * R * math.asin( math.sqrt( math.sin( ( lat2 - lat1 ) / 2 ) **2 + ( ( math.cos( lat1 ) * math.cos( lat2 ) ) * ( math.sin( ( lon2-lon1 ) / 2 ) **2 ) ) )
-)
+    distance =  2 * R * math.asin( math.sqrt( math.sin( ( lat2 - lat1 ) / 2 ) **2 + ( ( math.cos( lat1 ) * math.cos( lat2 ) ) * ( math.sin( ( lon2-lon1 ) / 2 ) **2 ) ) ))
     return distance
 
 
@@ -104,7 +103,7 @@ def validation_for_unit( unit ):
 
     else:
 
-        raise ValueError("unit should be a string")
+        raise TypeError("unit should be a string")
 
     return True
 
@@ -118,7 +117,7 @@ def validation_for_year(year):
 
     elif int(year) > 2021:
 
-        raise ValueError(" year should be less than 2021 ")
+        raise ValueError(" year should be earlier than 2021 ")
 
     else:
 

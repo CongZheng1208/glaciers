@@ -105,11 +105,11 @@ def test_validation_for_id_fail_on_non_5_length_id():
 
 
 def test_validation_for_id_fail_on_non_numeric_id():
-    with raises(TypeError) as e: 
+    with raises(ValueError) as e: 
         utils.validation_for_id( '78UX1' )
 
     exec_msg = e.value.args[0]
-    assert exec_msg == "id should be a integer"
+    assert exec_msg == "id should all consist of numbers"
 
 
 def test_validation_for_lat_fail_on_non_permitted_lat():
@@ -117,7 +117,7 @@ def test_validation_for_lat_fail_on_non_permitted_lat():
         utils.validation_for_lat( 120 )
 
     exec_msg = e.value.args[0]
-    assert exec_msg == " latitude should be in range of (-90,90) "
+    assert exec_msg == "latitude should be in range of (-90,90)"
 
 
 def test_validation_for_unit_fail_on_non_permitted_unit():
@@ -133,7 +133,7 @@ def test_validation_for_year_fail_on_future_year():
         utils.validation_for_year( '2035' )
 
     exec_msg = e.value.args[0]
-    assert exec_msg == " year should be earlier than 2021 "
+    assert exec_msg == "year should be earlier than 2021"
 
 
 def test_validation_for_code_pattern_fail_on_non_3_length_code():
@@ -160,12 +160,10 @@ def test_validation_for_code_pattern_fail_on_non_permitted_type():
     assert exec_msg == "code pattern should be a integer or a string"
 
 
-
-
-
-
-
 """以下测试用于测试add_mass_balance_measurement函数是否顺利读取了整体和局部测量的数据"""
+
+
+   
     
 
 """以下测试用于测试filter_by_code函数是否适用于完整代码和非完整代码模式"""

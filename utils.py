@@ -38,16 +38,25 @@ def validation_for_csv( file_path ):
 def validation_for_id(id):
     """This function is used to verify the correctness of the glacier identifier"""
 
-    if id.isdigit( ):
+    if isinstance( id, str ):
 
-        if len( id ) == 5:
-            pass
+        if id.isdigit( ):
+
+            if len( id ) == 5:
+                pass
+            else:
+                raise ValueError( "length of id should be 5" )
+        
         else:
-            raise ValueError( "length of id should be 5" )
+
+            raise ValueError( "id should all consist of numbers" ) 
+            
 
     else:
 
-        raise TypeError( "id should be a integer" )
+        raise TypeError( "id should be a string constructed from numbers" )
+
+ 
     
     return True
 
@@ -58,14 +67,14 @@ def validation_for_lat( lat ):
     if isinstance( lat , float ) or isinstance( lat, int ):
         if lat > 90 or lat < -90 :
 
-            raise ValueError(" latitude should be in range of (-90,90) ")
+            raise ValueError("latitude should be in range of (-90,90)")
 
         else:
 
             pass
     else:
 
-        raise TypeError(" latitude should be a number ")
+        raise TypeError("latitude should be a number")
 
     return True
 
@@ -77,14 +86,14 @@ def validation_for_lon( lon ):
 
         if lon > 180 or lon < -180:
 
-            raise ValueError(" lontitude should be in range of (-180,180) ")
+            raise ValueError("lontitude should be in range of (-180,180)")
 
         else:
 
             pass
     else:
 
-        raise TypeError(" lontitude should be a number ")
+        raise TypeError("lontitude should be a number")
 
     return True
 
@@ -111,17 +120,33 @@ def validation_for_unit( unit ):
 def validation_for_year(year):
     """This function is used to verify the correctness of the year"""
 
-    if not year.isdigit():
+    if isinstance( year, str ):
 
-        raise ValueError(" year should be a integer ")
+        if not year.isdigit():
 
-    elif int(year) > 2021:
+            raise ValueError("year should be a string constructed from numbers")
 
-        raise ValueError(" year should be earlier than 2021 ")
+        elif int(year) > 2021:
 
+            raise ValueError("year should be earlier than 2021")
+
+        else:
+
+            pass
+
+    elif isinstance( year, int ):
+
+        if year > 2021:
+
+            raise ValueError("year should be earlier than 2021")
+
+        else:
+
+            pass
+    
     else:
 
-        pass
+        raise TypeError("should be a integer or a string constructed from numbers")
 
     return True
 
@@ -191,14 +216,14 @@ def validation_for_n( n ):
 
         if n <= 0:
 
-            raise ValueError(" n should be an integer more than 0 ")
+            raise ValueError( "n should be an integer more than 0" )
 
         else:
 
             pass
     else:
 
-        raise TypeError(" n should be a integer ")
+        raise TypeError( "n should be a integer" )
 
     return True
 
@@ -208,7 +233,7 @@ def validation_for_glaciers( id_collection, current_id ):
     
     if current_id not in id_collection:
 
-        raise ValueError(" The identifier of the glacier could not be recognized! It does not exist in the current glacier collection. ")
+        raise ValueError("The identifier of the glacier could not be recognized! It does not exist in the current glacier collection.")
 
     else:
 

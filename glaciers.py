@@ -48,6 +48,8 @@ class Glacier:
         x_values = []
         y_values = []
 
+        output_path = Path( output_path )
+
         if self.mass_balance: 
 
             for year in self.mass_balance.keys():
@@ -60,7 +62,7 @@ class Glacier:
             pyplot.xlabel( "Year" )
             pyplot.ylabel( "Mass Balance Measurement [mm.w.e]" )
             pyplot.title( str( self.name ) + "'s diagram of changes in mass balance")
-            pyplot.savefig( output_path + str( self.name ) + "'s diagram of changes in mass balance.png")
+            pyplot.savefig( str(output_path) + str( self.name ) + "'s diagram of changes in mass balance.png")
         
         else:
 
@@ -72,6 +74,8 @@ class GlacierCollection:
 
     def __init__(self, file_path):
         """This function is used to initialize the glacier object collection"""
+
+        file_path = Path( file_path )
 
         utils.validation_for_csv( file_path )
 
@@ -102,6 +106,8 @@ class GlacierCollection:
 
     def read_mass_balance_data(self, file_path):
         """This function is used to read the mass balance measurement of the glacier object collection and add it to the corresponding glacier object"""
+
+        file_path = Path( file_path )
 
         utils.validation_for_csv( file_path )
 
@@ -285,6 +291,8 @@ class GlacierCollection:
         most_grow = -sys.maxsize
         grow_id = None
 
+        output_path = Path( output_path )
+
         for current_glacier in self.glacier_collection.values():
             
             year_order = sorted(current_glacier.mass_balance.keys(), key=lambda key: key)
@@ -329,4 +337,4 @@ class GlacierCollection:
         pyplot.ylabel("Mass Balance Measurement [mm.w.e]")
         pyplot.title("Diagram of the glaciers with the most shrinking mass balance")
 
-        pyplot.savefig( output_path + "Diagram of the glaciers with the most shrinking mass balance.png" )
+        pyplot.savefig( str(output_path) + "Diagram of the glaciers with the most shrinking mass balance.png" )

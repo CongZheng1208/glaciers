@@ -2,6 +2,7 @@
 from pathlib import Path
 import math
 
+
 def haversine_distance( lat1, lon1, lat2, lon2 ):
     """
     Return the distance in km between two points around the Earth.

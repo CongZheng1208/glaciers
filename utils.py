@@ -125,7 +125,7 @@ def validation_for_year(year):
 
         if not year.isdigit():
 
-            raise ValueError("year should be a string constructed from numbers")
+            raise ValueError("year should be constructed from numbers")
 
         elif int(year) > 2021:
 
@@ -147,7 +147,7 @@ def validation_for_year(year):
     
     else:
 
-        raise TypeError("should be a integer or a string constructed from numbers")
+        raise TypeError("year should be a integer or a string constructed from numbers")
 
     return True
 
@@ -202,7 +202,7 @@ def validation_for_code_pattern( code_pattern ):
         
         else:
         
-            raise TypeError( "length of code pattern should be 3" )
+            raise ValueError( "length of code pattern should be 3" )
     
     else:
         
@@ -210,8 +210,9 @@ def validation_for_code_pattern( code_pattern ):
     
     return full_code
 
+
 def validation_for_n( n ): 
-    """This function is used to verify the correctness of longitude"""
+    """This function is used to verify n"""
 
     if isinstance( n , int ):
 
@@ -225,6 +226,20 @@ def validation_for_n( n ):
     else:
 
         raise TypeError( "n should be a integer" )
+
+    return True
+
+
+def validation_for_reverse( reverse ): 
+    """This function is used to verify reverse"""
+
+    if isinstance( reverse , bool ):
+        
+        pass
+    
+    else:
+
+        raise TypeError( "reverse should be a boolean" )
 
     return True
 

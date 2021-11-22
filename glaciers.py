@@ -48,7 +48,7 @@ class Glacier:
         x_values = []
         y_values = []
 
-        output_path = Path( output_path )
+        #output_path = Path( output_path )
 
         if self.mass_balance: 
 
@@ -62,7 +62,7 @@ class Glacier:
             pyplot.xlabel( "Year" )
             pyplot.ylabel( "Mass Balance Measurement [mm.w.e]" )
             pyplot.title( str( self.name ) + "'s diagram of changes in mass balance")
-            pyplot.savefig( str(output_path) + str( self.name ) + "'s diagram of changes in mass balance.png")
+            pyplot.savefig( str(output_path) )
         
         else:
 
@@ -171,9 +171,9 @@ class GlacierCollection:
     
         if full_code:
 
-            for key in self.glacier_collection:
-                if self.glacier_collection[ key ].code == code_pattern:          
-                    glacier_names.append( self.glacier_collection[ key ].name )
+            for match_key in self.glacier_collection:
+                if int(self.glacier_collection[ match_key ].code) == int(code_pattern):           
+                    glacier_names.append( self.glacier_collection[ match_key ].name )
         
         else: 
 
@@ -191,7 +191,7 @@ class GlacierCollection:
         
             elif len(match_data) == 2:
                 index_0, index_1 = match_data[ 0 ], match_data[ 1 ] 
-                for match_key in self.glacier_collection:
+                for match_key in self.glacier_collection.keys():
 
                     glacier_match_code = str( self.glacier_collection[ match_key ].code )
                     if glacier_match_code[ index_0 ] == code_pattern[ index_0 ] and glacier_match_code[ index_1 ] == code_pattern[ index_1 ]:
@@ -203,7 +203,8 @@ class GlacierCollection:
     def sort_by_latest_mass_balance( self, n = 5, reverse = False ):
         """Return the N glaciers with the highest area accumulated in the last measurement."""
 
-        utils.validation_for_n(n)
+        utils.validation_for_n( n )
+        utils.validation_for_reverse( reverse )
 
         mass_balance_collection = {}
         latest_mass_balance_collection = []
@@ -291,7 +292,7 @@ class GlacierCollection:
         most_grow = -sys.maxsize
         grow_id = None
 
-        output_path = Path( output_path )
+        #output_path = Path( output_path )
 
         for current_glacier in self.glacier_collection.values():
             
@@ -317,12 +318,12 @@ class GlacierCollection:
             y_values_0.append(self.glacier_collection[shrink_id].mass_balance[year])
 
         pyplot.figure()
+
+        pyplot.subplot( 211 )
         pyplot.plot(x_values_0, y_values_0)
         pyplot.xlabel("Year")
         pyplot.ylabel("Mass Balance Measurement [mm.w.e]")
         pyplot.title("Diagram of the glaciers with the most growth in mass balance")
-
-        pyplot.savefig( output_path + "Diagram of the glaciers with the most growth in mass balance.png" )
 
         x_values_1 = []
         y_values_1 = []
@@ -331,10 +332,35 @@ class GlacierCollection:
             x_values_1.append(int(year))
             y_values_1.append(self.glacier_collection[grow_id].mass_balance[year])
 
-        pyplot.figure()
+        pyplot.subplot( 212 )
         pyplot.plot( x_values_1, y_values_1 )
         pyplot.xlabel("Year")
         pyplot.ylabel("Mass Balance Measurement [mm.w.e]")
         pyplot.title("Diagram of the glaciers with the most shrinking mass balance")
 
-        pyplot.savefig( str(output_path) + "Diagram of the glaciers with the most shrinking mass balance.png" )
+        pyplot.savefig( output_path )
+
+
+
+#file_path = Path("sheet-A.csv")
+#test = GlacierCollection(file_path)
+#test.read_mass_balance_data("sheet-EE.csv")
+#test.summary()
+#print(" ")
+#print(test.glacier_collection['03983'].mass_balance)
+#test.plot_extremes('/Users/congzheng/Desktop/')
+#print(test.filter_by_code('628'))
+#print(" ")
+#collection = test.sort_by_latest_mass_balance( 5, True )
+#list1 = []
+
+#for i in range(len(collection)):
+#    list1.append(collection[i].name)
+    #collection[i].plot_mass_balance('/Users/congzheng/Desktop/')
+
+#print(list1)
+
+#print(" ")
+#print(test.find_nearest( 10, 90, 10 ))
+#print(" ")
+#test.plot_extremes('/Users/congzheng/Desktop/')

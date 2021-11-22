@@ -48,8 +48,6 @@ class Glacier:
         x_values = []
         y_values = []
 
-        #output_path = Path( output_path )
-
         if self.mass_balance: 
 
             for year in self.mass_balance.keys():
@@ -60,7 +58,7 @@ class Glacier:
             pyplot.figure()
             pyplot.plot( x_values, y_values )
             pyplot.xlabel( "Year" )
-            pyplot.ylabel( "Mass Balance Measurement [mm.w.e]" )
+            pyplot.ylabel( "Mass Balance [mm.w.e]" )
             pyplot.title( str( self.name ) + "'s diagram of changes in mass balance")
             pyplot.savefig( str(output_path) )
         
@@ -322,7 +320,7 @@ class GlacierCollection:
         pyplot.subplot( 211 )
         pyplot.plot(x_values_0, y_values_0)
         pyplot.xlabel("Year")
-        pyplot.ylabel("Mass Balance Measurement [mm.w.e]")
+        pyplot.ylabel("Mass Balance [mm.w.e]")
         pyplot.title("Diagram of the glaciers with the most growth in mass balance")
 
         x_values_1 = []
@@ -335,32 +333,9 @@ class GlacierCollection:
         pyplot.subplot( 212 )
         pyplot.plot( x_values_1, y_values_1 )
         pyplot.xlabel("Year")
-        pyplot.ylabel("Mass Balance Measurement [mm.w.e]")
+        pyplot.ylabel("Mass Balance [mm.w.e]")
         pyplot.title("Diagram of the glaciers with the most shrinking mass balance")
 
+        pyplot.subplots_adjust(wspace =1, hspace =0.5)
+
         pyplot.savefig( output_path )
-
-
-
-#file_path = Path("sheet-A.csv")
-#test = GlacierCollection(file_path)
-#test.read_mass_balance_data("sheet-EE.csv")
-#test.summary()
-#print(" ")
-#print(test.glacier_collection['03983'].mass_balance)
-#test.plot_extremes('/Users/congzheng/Desktop/')
-#print(test.filter_by_code('628'))
-#print(" ")
-#collection = test.sort_by_latest_mass_balance( 5, True )
-#list1 = []
-
-#for i in range(len(collection)):
-#    list1.append(collection[i].name)
-    #collection[i].plot_mass_balance('/Users/congzheng/Desktop/')
-
-#print(list1)
-
-#print(" ")
-#print(test.find_nearest( 10, 90, 10 ))
-#print(" ")
-#test.plot_extremes('/Users/congzheng/Desktop/')

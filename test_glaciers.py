@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*--v
+
 import pytest
 import utils
 
